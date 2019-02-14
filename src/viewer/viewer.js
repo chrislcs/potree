@@ -27,6 +27,7 @@ import {OrbitControls} from "../navigation/OrbitControls.js";
 import {FirstPersonControls} from "../navigation/FirstPersonControls.js";
 import {EarthControls} from "../navigation/EarthControls.js";
 import {DeviceOrientationControls} from "../navigation/DeviceOrientationControls.js";
+import {PathControls} from "../navigation/PathControls.js"
 import { EventDispatcher } from "../EventDispatcher.js";
 import { ClassificationScheme } from "../materials/ClassificationScheme.js";
 
@@ -1074,6 +1075,14 @@ export class Viewer extends EventDispatcher{
 			this.deviceControls.enabled = false;
 			this.deviceControls.addEventListener('start', this.disableAnnotations.bind(this));
 			this.deviceControls.addEventListener('end', this.enableAnnotations.bind(this));
+		}
+
+		
+		{ // create PATH CONTROLS
+			this.pathControls = new PathControls(this);
+			this.pathControls.enabled = false;
+			this.pathControls.addEventListener('start', this.disableAnnotations.bind(this));
+			this.pathControls.addEventListener('end', this.enableAnnotations.bind(this));
 		}
 	};
 
