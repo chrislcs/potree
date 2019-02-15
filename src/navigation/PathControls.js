@@ -165,7 +165,7 @@ export class PathControls extends EventDispatcher {
           this.position = this.position - 1;
         }
         const point = path.getPointAt(this.position);
-        view.position.set(point.x, point.y, point.z + 0.5);
+        view.position.set(point.x, point.y, point.z);
       }
     }
 
