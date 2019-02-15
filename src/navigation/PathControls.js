@@ -35,7 +35,7 @@ export class PathControls extends EventDispatcher {
 
     this.rotationSpeed = 200;
     this.moveSpeed = 10;
-    this.lockElevation = false;
+    this.loop = true;
 
     this.keys = {
       FORWARD: ['W'.charCodeAt(0), 38],
@@ -159,11 +159,22 @@ export class PathControls extends EventDispatcher {
       if (this.path !== null) {
         const deltaPosition = (this.translationDelta.y * delta) / this.pathLength;
         this.position += deltaPosition;
+
+        // Handle out of bounds
         if (this.position < 0) {
+          if (this.loop) {
           this.position = 1 + this.position;
+          } else {
+            this.position = 0;
+          }
         } else if (this.position > 1) {
+          if (this.loop) {
           this.position = this.position - 1;
+          } else {
+            this.position = 1;
+          }
         }
+
         const point = path.getPointAt(this.position);
         view.position.set(point.x, point.y, point.z);
       }
