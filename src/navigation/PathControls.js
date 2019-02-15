@@ -1,5 +1,5 @@
 /**
- * @author chrisl / Geodan
+ * @author chrislcs / Geodan
  *
  * adopted from Potree.FirstPersonControls by
  *
@@ -163,13 +163,13 @@ export class PathControls extends EventDispatcher {
         // Handle out of bounds
         if (this.position < 0) {
           if (this.loop) {
-          this.position = 1 + this.position;
+            this.position = 1 + this.position;
           } else {
             this.position = 0;
           }
         } else if (this.position > 1) {
           if (this.loop) {
-          this.position = this.position - 1;
+            this.position = this.position - 1;
           } else {
             this.position = 1;
           }
@@ -192,5 +192,30 @@ export class PathControls extends EventDispatcher {
       this.pitchDelta *= attenuation;
       this.translationDelta.multiplyScalar(attenuation);
     }
+  }
+
+  moveTo(position, duration) {
+    const view = this.scene.view;
+
+    const deltaPosition = position - this.position;
+    const deltaPositionPerSecond = deltaPosition / duration;
+    const updatesPerSecond = 1000 / 60;
+    const deltaPositionPerUpdate = deltaPositionPerSecond / updatesPerSecond;
+
+    const updatePosition = setInterval(() => {
+      // Get new position
+      this.position += deltaPositionPerUpdate;
+
+      // Update position
+      const point = path.getPointAt(this.position);
+      view.position.set(point.x, point.y, point.z);
+
+      // Stop interval when at target position
+      if (deltaPosition > 0 && this.position > position) {
+        clearInterval(updatePosition);
+      } else if (deltaPosition < 0 && this.position < position) {
+        clearInterval(updatePosition);
+      }
+    }, updatesPerSecond);
   }
 }
