@@ -114,6 +114,26 @@ export class PathControls extends EventDispatcher {
     this.translationDelta.set(0, 0, 0);
   }
 
+  moveTo(position, animationDuration) {
+    const value = { x: this.position };
+
+    const tween = new TWEEN.Tween(value).to({ x: position }, animationDuration);
+    tween.easing(TWEEN.Easing.Quadratic.InOut);
+    this.tweens.push(tween);
+
+    tween.onUpdate(() => {
+      this.position = value.x;
+      const point = this.path.getPointAt(this.position);
+      this.scene.view.position.set(point.x, point.y, point.z);
+    });
+
+    tween.onComplete(() => {
+      this.tweens = this.tweens.filter(e => e !== tween);
+    });
+
+    tween.start();
+  }
+
   update(delta) {
     let view = this.scene.view;
 
@@ -192,30 +212,5 @@ export class PathControls extends EventDispatcher {
       this.pitchDelta *= attenuation;
       this.translationDelta.multiplyScalar(attenuation);
     }
-  }
-
-  moveTo(position, duration) {
-    const view = this.scene.view;
-
-    const deltaPosition = position - this.position;
-    const deltaPositionPerSecond = deltaPosition / duration;
-    const updatesPerSecond = 1000 / 60;
-    const deltaPositionPerUpdate = deltaPositionPerSecond / updatesPerSecond;
-
-    const updatePosition = setInterval(() => {
-      // Get new position
-      this.position += deltaPositionPerUpdate;
-
-      // Update position
-      const point = path.getPointAt(this.position);
-      view.position.set(point.x, point.y, point.z);
-
-      // Stop interval when at target position
-      if (deltaPosition > 0 && this.position > position) {
-        clearInterval(updatePosition);
-      } else if (deltaPosition < 0 && this.position < position) {
-        clearInterval(updatePosition);
-      }
-    }, updatesPerSecond);
   }
 }
