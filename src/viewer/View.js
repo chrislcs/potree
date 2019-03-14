@@ -74,6 +74,32 @@ export class View{
 		this.direction = dir;
 	}
 
+	lookAtAnimated(target, animationDuration) {
+		// Current direction
+		let value = { pitch: this.pitch, yaw: this.yaw };
+
+		// Target direction
+		const V = new THREE.Vector3().subVectors(target, this.position);
+		const radius = V.length();
+		const targetDirection = V.normalize();
+		this.radius = radius;
+
+		let targetYaw = Math.atan2(targetDirection.y, targetDirection.x) - Math.PI / 2;
+		let targetPitch = Math.atan2(targetDirection.z, Math.sqrt(targetDirection.x * targetDirection.x + targetDirection.y * targetDirection.y));
+
+		const targetValue = { pitch: targetPitch, yaw: targetYaw };
+
+		// Tween from current to target
+		const tween = new TWEEN.Tween( value ).to( targetValue, animationDuration )
+		tween.easing(TWEEN.Easing.Quadratic.InOut);
+		tween.onUpdate(() => {
+			this.yaw = value.yaw;
+			this.pitch = value.pitch;
+		});
+
+		tween.start();
+	}
+
 	getPivot () {
 		return new THREE.Vector3().addVectors(this.position, this.direction.multiplyScalar(this.radius));
 	}
