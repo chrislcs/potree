@@ -36,6 +36,7 @@ export class PathControls extends EventDispatcher {
     this.rotationSpeed = 200;
     this.moveSpeed = 10;
     this.loop = true;
+    this.userInputCancels = true;
 
     this.keys = {
       FORWARD: ['W'.charCodeAt(0), 38],
@@ -137,7 +138,7 @@ export class PathControls extends EventDispatcher {
   update(delta) {
     let view = this.scene.view;
 
-    {
+    if (this.userInputCancels) {
       // cancel move animations on user input
       let changes = [this.yawDelta, this.pitchDelta, this.translationDelta.length()];
       let changeHappens = changes.some(e => Math.abs(e) > 0.001);
@@ -153,6 +154,14 @@ export class PathControls extends EventDispatcher {
 
       let moveForward = this.keys.FORWARD.some(e => ih.pressedKeys[e]);
       let moveBackward = this.keys.BACKWARD.some(e => ih.pressedKeys[e]);
+
+      if (this.userInputCancels) {
+        // cancel move animations on user input
+        if (moveForward || moveBackward) {
+          this.tweens.forEach(e => e.stop());
+          this.tweens = [];
+        }
+      }
 
       if (moveForward && moveBackward) {
         this.translationDelta.y = 0;
