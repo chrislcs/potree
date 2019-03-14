@@ -116,11 +116,12 @@ export class PathControls extends EventDispatcher {
     this.translationDelta.set(0, 0, 0);
   }
 
-  moveTo(position, animationDuration) {
+  moveTo(position, animationDuration, callback) {
     const value = { x: this.position };
 
     const tween = new TWEEN.Tween(value).to({ x: position }, animationDuration);
     tween.easing(TWEEN.Easing.Quadratic.InOut);
+
     this.tweens.push(tween);
 
     tween.onUpdate(() => {
@@ -131,6 +132,9 @@ export class PathControls extends EventDispatcher {
 
     tween.onComplete(() => {
       this.tweens = this.tweens.filter(e => e !== tween);
+      if (callback) {
+        callback();
+      }
     });
 
     tween.start();
