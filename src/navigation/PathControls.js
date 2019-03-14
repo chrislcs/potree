@@ -37,6 +37,7 @@ export class PathControls extends EventDispatcher {
     this.moveSpeed = 10;
     this.loop = true;
     this.userInputCancels = true;
+    this.lockViewToPath = false;
 
     this.keys = {
       FORWARD: ['W'.charCodeAt(0), 38],
@@ -172,7 +173,12 @@ export class PathControls extends EventDispatcher {
       }
     }
 
-    {
+    if (this.lockViewToPath) {
+      const pathTangent = this.path.getTangentAt(this.position);
+      view.direction = pathTangent;
+    } else if (this.viewTarget !== null) {
+      view.lookAt(this.viewTarget);
+    } else {
       // apply rotation
       let yaw = view.yaw;
       let pitch = view.pitch;
