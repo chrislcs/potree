@@ -39,6 +39,8 @@ export class PathControls extends EventDispatcher {
     this.userInputCancels = true;
     this.lockViewToPath = false;
 
+    this.viewTarget = null;
+
     this.keys = {
       FORWARD: ['W'.charCodeAt(0), 38],
       BACKWARD: ['S'.charCodeAt(0), 40]
@@ -114,6 +116,16 @@ export class PathControls extends EventDispatcher {
     this.yawDelta = 0;
     this.pitchDelta = 0;
     this.translationDelta.set(0, 0, 0);
+  }
+
+  lockViewTo(target) {
+    this.viewTarget = target;
+    this.lockViewToPath = false;
+  }
+
+  unlockView() {
+    this.viewTarget = null;
+    this.lockViewToPath = false;
   }
 
   moveTo(position, animationDuration, callback) {
