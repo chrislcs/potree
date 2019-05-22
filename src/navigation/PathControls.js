@@ -37,7 +37,7 @@ export class PathControls extends EventDispatcher {
     this.moveSpeed = 10;
     this.loop = true;
     this.userInputCancels = true;
-    this.lockViewToPath = false;
+    this.lockViewToPath = 'never'; // options: 'never', 'moving', 'always'
 
     this.viewTarget = null;
 
@@ -120,19 +120,19 @@ export class PathControls extends EventDispatcher {
 
   lockViewTo(target) {
     this.viewTarget = target;
-    this.lockViewToPath = false;
+    this.lockViewToPath = 'never';
   }
 
   unlockView() {
     this.viewTarget = null;
-    this.lockViewToPath = false;
+    this.lockViewToPath = 'never';
   }
 
   moveTo(position, animationDuration, callback) {
     const value = { x: this.position };
 
     const tween = new TWEEN.Tween(value).to({ x: position }, animationDuration);
-    tween.easing(TWEEN.Easing.Quadratic.InOut);
+    tween.easing(TWEEN.Easing.Quadratic.Out);
 
     this.tweens.push(tween);
 
@@ -187,23 +187,32 @@ export class PathControls extends EventDispatcher {
       } else if (moveBackward) {
         this.translationDelta.y = -this.viewer.getMoveSpeed();
       }
-    }
 
-    if (this.lockViewToPath) {
-      const pathTangent = this.path.getTangentAt(this.position);
-      view.direction = pathTangent;
-    } else if (this.viewTarget !== null) {
-      view.lookAt(this.viewTarget);
-    } else {
-      // apply rotation
-      let yaw = view.yaw;
-      let pitch = view.pitch;
+      if (this.lockViewToPath === 'always') {
+        const dotLookDirMoveDir = view.direction.dot(this.path.getTangentAt(this.position));
+        const scale = 0.08 + Math.abs(dotLookDirMoveDir - 1) / 10;
+        view.direction = view.direction.add(
+          this.path.getTangentAt(this.position).multiplyScalar(scale)
+        );
+      } else if (this.lockViewToPath === 'moving' && (moveForward || moveBackward)) {
+        const dotLookDirMoveDir = view.direction.dot(this.path.getTangentAt(this.position));
+        const scale = 0.02 + Math.abs(dotLookDirMoveDir - 1) / 10;
+        view.direction = view.direction.add(
+          this.path.getTangentAt(this.position).multiplyScalar(scale)
+        );
+      } else if (this.viewTarget !== null) {
+        view.lookAt(this.viewTarget);
+      } else {
+        // apply rotation
+        let yaw = view.yaw;
+        let pitch = view.pitch;
 
-      yaw -= this.yawDelta * delta;
-      pitch -= this.pitchDelta * delta;
+        yaw -= this.yawDelta * delta;
+        pitch -= this.pitchDelta * delta;
 
-      view.yaw = yaw;
-      view.pitch = pitch;
+        view.yaw = yaw;
+        view.pitch = pitch;
+      }
     }
 
     {
