@@ -102,6 +102,11 @@ gulp.task("build", ['workers','shaders', "icons_viewer", "examples_page"], funct
 	gulp.src(["LICENSE"])
 		.pipe(gulp.dest('build/potree'));
 
+	exec('rollup -c', function (err, stdout, stderr) {
+		console.log(stdout);
+		console.log(stderr);
+	});
+
 	return;
 });
 
@@ -393,13 +398,6 @@ gulp.task('icons_viewer', function() {
 });
 
 gulp.task('watch', ["build", "webserver"], function() {
-	//gulp.run("build");
-
-	exec('rollup -c', function (err, stdout, stderr) {
-		console.log(stdout);
-		console.log(stderr);
-	});
-
 	//gulp.run("webserver");
 
 	let watchlist = [
@@ -430,14 +428,7 @@ gulp.task('watch', ["build", "webserver"], function() {
 		console.log("watch event:");
 		console.log(cb);
 		gulp.run("build");
-
-		exec('rollup -c', function (err, stdout, stderr) {
-			console.log(stdout);
-			console.log(stderr);
-			//cb(err);
-		});
 	});
-
 });
 
 
