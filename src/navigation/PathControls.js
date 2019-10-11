@@ -132,7 +132,7 @@ export class PathControls extends EventDispatcher {
     const value = { x: this.position };
 
     const tween = new TWEEN.Tween(value).to({ x: position }, animationDuration);
-    tween.easing(TWEEN.Easing.Cubic.Out);
+    tween.easing(TWEEN.Easing.Quartic.Out);
 
     this.tweens.push(tween);
 
