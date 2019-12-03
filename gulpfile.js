@@ -92,12 +92,6 @@ gulp.task('icons_viewer', async function(done) {
 
 });
 
-gulp.task('test', async function() {
-
-	console.log("asdfiae8ofh");
-
-});
-
 gulp.task("workers", async function(done){
 
 	for(let workerName of Object.keys(workers)){
@@ -151,9 +145,16 @@ gulp.task("shaders", async function(){
 	fs.writeFileSync(targetPath, content, {flag: "w"});
 });
 
+gulp.task("pack", async function(){
+	exec('rollup -c', function (err, stdout, stderr) {
+		console.log(stdout);
+		console.log(stderr);
+	});
+});
+
 gulp.task('build', 
 	gulp.series(
-		gulp.parallel("workers", "lazylibs", "shaders", "icons_viewer", "examples_page"),
+		gulp.parallel("workers", "lazylibs", "shaders", "icons_viewer", "examples_page", "pack"),
 		async function(done){
 			gulp.src(paths.html).pipe(gulp.dest('build/potree'));
 
@@ -166,14 +167,7 @@ gulp.task('build',
 	)
 );
 
-gulp.task("pack", async function(){
-	exec('rollup -c', function (err, stdout, stderr) {
-		console.log(stdout);
-		console.log(stderr);
-	});
-});
-
-gulp.task('watch', gulp.parallel("build", "pack", "webserver", async function() {
+gulp.task('watch', gulp.parallel("build", "webserver", async function() {
 
 	let watchlist = [
 		'src/**/*.js',
@@ -187,7 +181,7 @@ gulp.task('watch', gulp.parallel("build", "pack", "webserver", async function() 
 		'!resources/icons/index.html',
 	];
 
-	watch(watchlist, gulp.series("build", "pack"));
+	watch(watchlist, gulp.series("build"));
 
 }));
 
