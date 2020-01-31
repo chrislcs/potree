@@ -154,9 +154,6 @@ export class PathControls extends EventDispatcher {
   }
 
   update(delta) {
-    if (this.lockPosition) {
-      return;
-    }
     let view = this.scene.view;
 
     if (this.userInputCancels) {
@@ -192,13 +189,13 @@ export class PathControls extends EventDispatcher {
         this.translationDelta.y = -this.viewer.getMoveSpeed();
       }
 
-      if (this.lockViewToPath === 'always') {
+      if (!this.lockPosition && this.lockViewToPath === 'always') {
         const dotLookDirMoveDir = view.direction.dot(this.path.getTangentAt(this.position));
         const scale = 0.08 + Math.abs(dotLookDirMoveDir - 1) / 10;
         view.direction = view.direction.add(
           this.path.getTangentAt(this.position).multiplyScalar(scale)
         );
-      } else if (this.lockViewToPath === 'moving' && (moveForward || moveBackward)) {
+      } else if (!this.lockPosition && this.lockViewToPath === 'moving' && (moveForward || moveBackward)) {
         const dotLookDirMoveDir = view.direction.dot(this.path.getTangentAt(this.position));
         const scale = 0.02 + Math.abs(dotLookDirMoveDir - 1) / 10;
         view.direction = view.direction.add(
@@ -220,7 +217,7 @@ export class PathControls extends EventDispatcher {
     }
 
     {
-      if (this.path !== null) {
+      if (!this.lockPosition && this.path !== null) {
         const deltaPosition = (this.translationDelta.y * delta) / this.pathLength;
         this.position += deltaPosition;
 
