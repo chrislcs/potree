@@ -38,6 +38,7 @@ export class PathControls extends EventDispatcher {
     this.loop = true;
     this.userInputCancels = true;
     this.lockViewToPath = 'never'; // options: 'never', 'moving', 'always'
+    this.lockPosition = false;
 
     this.viewTarget = null;
 
@@ -153,6 +154,9 @@ export class PathControls extends EventDispatcher {
   }
 
   update(delta) {
+    if (this.lockPosition) {
+      return;
+    }
     let view = this.scene.view;
 
     if (this.userInputCancels) {
